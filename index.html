@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="pageTitle">Jayasiuteyou ♡</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #f8f8fa;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --border-color: #e5e5ea;
+      --border-dashed: #d1d1d6;
+      --text-dark: #2c2c2e;
+      --text-muted: #8e8e93;
+      --pastel-gray: #a2a2a7;
+      --accent-dark: #1c1c1e;
+      --star-pastel-gray: #8e8e93;
+      --star-inactive: #e5e5ea;
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', 'Mitr', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #ffffff 0%, #f4f4f6 60%, #ebebef 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Layer */
+    .floating-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .float-item {
+      position: absolute;
+      bottom: -60px;
+      font-size: 20px;
+      animation: floatUp 12s linear infinite;
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      15% { opacity: 0.7; }
+      85% { opacity: 0.7; }
+      100% { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
+    }
+
+    .container {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 16px 14px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Top Navigation Tabs */
+    .top-nav {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 26px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      background: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 20px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--accent-dark);
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-color);
+    }
+
+    .music-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-left: 6px;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Home */
+    .banner-box {
+      width: 100%;
+      height: 155px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1.5px solid var(--border-color);
+      background: #ffffff;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 22px;
+    }
+
+    .banner-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-wrap {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .profile-circle {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto;
+      border-radius: 50%;
+      padding: 3px;
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 0 0 4px #f4f4f6, var(--shadow-soft);
+    }
+
+    .profile-circle img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .store-title {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-top: 10px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .bio-dashed-box {
+      background: #ffffff;
+      border: 1.5px dashed var(--border-dashed);
+      border-radius: 22px;
+      padding: 16px 14px;
+      margin-top: 14px;
+      text-align: center;
+      line-height: 1.7;
+      font-size: 13.5px;
+      color: var(--text-dark);
+      white-space: pre-line;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.02);
+    }
+
+    .section-label {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin: 22px 0 12px 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .highlights-row {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .highlights-row::-webkit-scrollbar { display: none; }
+
+    .hl-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hl-ring {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      padding: 2.5px;
+      background: linear-gradient(135deg, #d1d1d6, #8e8e93);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hl-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ffffff;
+      background: #ffffff;
+    }
+
+    .hl-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      max-width: 72px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    /* Review Tab */
+    .review-form-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 24px;
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 20px;
+    }
+
+    .clean-input {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-dark);
+      outline: none;
+      background: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .stars-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 26px;
+      color: var(--star-inactive);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .star-btn.active {
+      color: var(--star-pastel-gray);
+      transform: scale(1.15);
+    }
+
+    .clean-textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-dark);
+      outline: none;
+      background: #ffffff;
+      min-height: 80px;
+      resize: vertical;
+      margin-bottom: 16px;
+    }
+
+    .pill-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #48484a, #1c1c1e);
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .review-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.02);
+      margin-bottom: 10px;
+    }
+
+    .review-bubble-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .review-cust-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .review-stars-display {
+      color: var(--star-pastel-gray);
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+
+    .review-cust-msg {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Contact Tab */
+    .contact-card-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .contact-bubble-link {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .contact-bubble-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .contact-circle-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f2f2f7;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--accent-dark);
+    }
+
+    /* Details Tab */
+    .details-white-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: 22px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow-soft);
+      line-height: 1.8;
+      font-size: 13.5px;
+      color: var(--text-dark);
+      white-space: pre-line;
+      margin-bottom: 14px;
+    }
+
+    .thanks-bubble {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--accent-dark);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      line-height: 1.5;
+    }
+
+    /* Story Fullscreen Viewer */
+    .story-modal {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 9999999;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .story-modal.show { display: flex; }
+
+    .story-bars {
+      display: flex;
+      gap: 4px;
+      padding: 12px 14px 6px;
+      z-index: 10;
+    }
+
+    .story-bar {
+      flex: 1;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .story-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: #ffffff;
+      transition: width 0.1s linear;
+    }
+
+    .story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 14px;
+      z-index: 10;
+      color: #fff;
+    }
+
+    .story-body {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    .story-body img {
+      width: 100%;
+      height: 100%;
+      max-height: 92vh;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    .story-nav-btn {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      z-index: 99999;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .story-nav-left { left: 0; }
+    .story-nav-right { right: 0; }
+  </style>
+</head>
+<body>
+
+  <audio id="bgMusic" loop preload="auto" src=""></audio>
+  <div class="floating-layer" id="floatingLayer"></div>
+
+  <div class="container">
+
+    <!-- Top Bar -->
+    <div class="top-nav">
+      <div class="nav-tabs">
+        <button type="button" class="tab-btn active" onclick="switchNavTab('home')">Home</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('review')">Review</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('contact')">Contact</button>
+        <button type="button" class="tab-btn" onclick="switchNavTab('details')">Details</button>
+      </div>
+      <button type="button" class="music-btn" onclick="toggleAudio()">🎵</button>
+    </div>
+
+    <!-- 1. Home -->
+    <div class="tab-content active" id="tab-home">
+      <div class="banner-box">
+        <img id="mainBanner" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop" alt="Banner">
+      </div>
+
+      <div class="profile-wrap">
+        <div class="profile-circle">
+          <img id="mainProfile" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop" alt="Profile">
+        </div>
+      </div>
+
+      <h1 class="store-title" id="storeNameText">Jayasiuteyou</h1>
+
+      <div class="bio-dashed-box" id="bioBoxText">
+welcome to jayasiuteyou ♡
+รับกดกรอบป้ายชื่อเอฟเฟค discord
+รับส่งสติ๊กเกอร์ อีโมจิ ธีม เมโลดี้ ♡
+      </div>
+
+      <div class="section-label">
+        <span>✨</span> <span>Highlights</span>
+      </div>
+
+      <!-- ไฮไลท์ไม่จำกัดจำนวน -->
+      <div class="highlights-row" id="highlightsBar"></div>
+    </div>
+
+    <!-- 2. Review -->
+    <div class="tab-content" id="tab-review">
+      <div class="review-form-card">
+        <div style="font-weight:700; color:var(--accent-dark); font-size:15px; margin-bottom:12px;">review jaya ♡</div>
+        <input type="text" id="custNameInput" class="clean-input" placeholder="ชื่อของคุณ ♡">
+        
+        <!-- ดาวสีเทาพาสเทล -->
+        <div class="stars-selector">
+          <button type="button" class="star-btn active" onclick="selectStar(1)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(2)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(3)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(4)">★</button>
+          <button type="button" class="star-btn active" onclick="selectStar(5)">★</button>
+        </div>
+
+        <textarea id="custMsgInput" class="clean-textarea" placeholder="review dailoeynakaa"></textarea>
+        <button type="button" class="pill-btn" id="sendReviewBtn" onclick="submitReview()">sent review ♡</button>
+      </div>
+
+      <div class="section-label">
+        <span>💬</span> <span>♡ รีวิวทั้งหมด</span>
+      </div>
+      <div id="feedbackFeed"></div>
+    </div>
+
+    <!-- 3. Contact -->
+    <div class="tab-content" id="tab-contact">
+      <div class="bio-dashed-box" style="margin-top:0;">
+        <div style="font-weight:700; color:var(--accent-dark); margin-bottom:4px;">contact me ♡</div>
+        ทักสอบถามสั่งซื้อติดต่อกดด้านล่างได้เลยนะคะ
+      </div>
+
+      <div class="contact-card-box">
+        <!-- LINE -->
+        <a id="lineLink" href="https://line.me/ti/p/_HeqXP_hLu" target="_blank" class="contact-bubble-link">
+          <div class="contact-bubble-left">
+            <div class="contact-circle-icon">💬</div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">Line me ♡ dm</div>
+              <div style="font-size:12px; color:var(--text-muted);">ติดต่อสอบถาม - สั่งซื้อสินค้า</div>
+            </div>
+          </div>
+          <span style="color:var(--text-muted); font-size:13px;">♡</span>
+        </a>
+
+        <!-- Discord -->
+        <a id="discordLink" href="https://discord.gg/ReEeJqNCmA" target="_blank" class="contact-bubble-link">
+          <div class="contact-bubble-left">
+            <div class="contact-circle-icon">🎮</div>
+            <div>
+              <div style="font-weight:700; font-size:14px;">Discord ♡ dm</div>
+              <div style="font-size:12px; color:var(--text-muted);">ทักแชทด่วนในดิสคอร์ด</div>
+            </div>
+          </div>
+          <span style="color:var(--text-muted); font-size:13px;">♡</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 4. Details -->
+    <div class="tab-content" id="tab-details">
+      <div class="details-white-card">
+        <div style="font-weight:700; color:var(--accent-dark); margin-bottom:8px;" id="detailsTitle">รายละเอียดร้าน jayasiuteyou</div>
+        <div id="detailsContentText">
+รับกด กรอบ ป้ายชื่อ เอฟเฟกต์ discord เริ่มต้น 40.-
+รับส่งสติ๊กִเกอׂร์ ธีมִ
+เׂมโลִดี้ อีโมจิ
+และอื่นๆที่ได้เงิน ♡
+        </div>
+      </div>
+
+      <div class="thanks-bubble">
+        <div>♡ 감사합니다 ♡</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Story Modal -->
+  <div class="story-modal" id="storyModal">
+    <div class="story-bars" id="storyBars"></div>
+    <div class="story-header">
+      <span id="storyTitleText" style="font-weight:600; font-size:14px;">Highlight</span>
+      <button style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;" onclick="closeStoryModal()">✕</button>
+    </div>
+    <div class="story-body">
+      <div class="story-nav-btn story-nav-left" id="storyNavLeft"></div>
+      <img id="storyActiveImg" src="" alt="Story" draggable="false">
+      <div class="story-nav-btn story-nav-right" id="storyNavRight"></div>
+    </div>
+  </div>
+
+  <script>
+    // แยกฐานข้อมูลใหม่เฉพาะโปรเจกต์ jayasiuteyou เท่านั้น
+    const DB_CONFIG = "jayasiuteyou_config";
+    const DB_REVIEWS = "jayasiuteyou_reviews";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpAGDSy1NRgmLV_g7qJrCpwOhU9MrfQyY",
+      authDomain: "benefitie.firebaseapp.com",
+      projectId: "benefitie",
+      storageBucket: "benefitie.firebasestorage.app",
+      messagingSenderId: "270365672215",
+      appId: "1:270365672215:web:230d1491091e26ce83ed52"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const audio = document.getElementById('bgMusic');
+    let audioContext;
+    function unlockAudio() {
+      if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      if (audio.paused && audio.src) audio.play().catch(() => {});
+    }
+    window.addEventListener('load', unlockAudio);
+    ['touchstart', 'touchend', 'click', 'scroll', 'pointerdown'].forEach(e => {
+      document.addEventListener(e, function run() {
+        unlockAudio();
+        document.removeEventListener(e, run);
+      }, { passive: true });
+    });
+
+    function toggleAudio() {
+      if (audio.paused) audio.play().catch(() => {});
+      else audio.pause();
+    }
+
+    function switchNavTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    let highlightsData = [];
+
+    // ดึงข้อมูล Realtime
+    db.collection(DB_CONFIG).doc("main").onSnapshot(doc => {
+      if (doc.exists) {
+        const d = doc.data();
+        if (d.siteTitle) document.getElementById('pageTitle').textContent = d.siteTitle;
+        if (d.storeName) document.getElementById('storeNameText').textContent = d.storeName;
+        if (d.storeBio) document.getElementById('bioBoxText').textContent = d.storeBio;
+        if (d.bannerImg) document.getElementById('mainBanner').src = d.bannerImg;
+        if (d.profileImg) document.getElementById('mainProfile').src = d.profileImg;
+        if (d.details) document.getElementById('detailsContentText').textContent = d.details;
+        if (d.lineUrl) document.getElementById('lineLink').href = d.lineUrl;
+        if (d.discordUrl) document.getElementById('discordLink').href = d.discordUrl;
+
+        if (d.musicUrl && audio.src !== d.musicUrl) {
+          audio.src = d.musicUrl;
+          unlockAudio();
+        }
+
+        if (d.highlights && Array.isArray(d.highlights)) {
+          highlightsData = d.highlights;
+          renderHighlights(d.highlights);
+        }
+      } else {
+        renderHighlights(highlightsData);
+      }
+    });
+
+    function renderHighlights(hl) {
+      const bar = document.getElementById('highlightsBar');
+      bar.innerHTML = '';
+      if (!hl || hl.length === 0) {
+        bar.innerHTML = '<span style="font-size:12px; color:var(--text-muted); padding:4px;">ไม่มีไฮไลท์</span>';
+        return;
+      }
+      hl.forEach((item, idx) => {
+        const cover = item.cover || (item.images && item.images[0]) || "";
+        const div = document.createElement('div');
+        div.className = 'hl-item';
+        div.onclick = () => openStory(idx);
+        div.innerHTML = `
+          <div class="hl-ring"><img src="${cover}" alt="HL"></div>
+          <div class="hl-label">${item.title || 'Highlight'}</div>
+        `;
+        bar.appendChild(div);
+      });
+    }
+
+    // Story System
+    let activeHlIdx = 0;
+    let activeSlideIdx = 0;
+    let slideTimer = null;
+
+    function openStory(idx) {
+      activeHlIdx = idx;
+      activeSlideIdx = 0;
+      const hl = highlightsData[idx];
+      if (!hl || !hl.images || !hl.images.length) {
+        alert("ยังไม่มีรูปในไฮไลท์นี้ค่ะ ♡");
+        return;
+      }
+      document.getElementById('storyTitleText').textContent = hl.title || 'Highlight';
+      buildStoryBars();
+      showStorySlide();
+      document.getElementById('storyModal').classList.add('show');
+    }
+
+    function buildStoryBars() {
+      const hl = highlightsData[activeHlIdx];
+      const bars = document.getElementById('storyBars');
+      bars.innerHTML = '';
+      hl.images.forEach((_, i) => {
+        const bar = document.createElement('div');
+        bar.className = 'story-bar';
+        bar.innerHTML = `<div class="story-bar-fill" id="sb-${i}"></div>`;
+        bars.appendChild(bar);
+      });
+    }
+
+    function showStorySlide() {
+      clearTimeout(slideTimer);
+      const hl = highlightsData[activeHlIdx];
+      document.getElementById('storyActiveImg').src = hl.images[activeSlideIdx];
+
+      hl.images.forEach((_, i) => {
+        const fill = document.getElementById(`sb-${i}`);
+        if (!fill) return;
+        if (i < activeSlideIdx) fill.style.width = '100%';
+        else if (i === activeSlideIdx) {
+          fill.style.width = '0%';
+          setTimeout(() => { fill.style.width = '100%'; }, 50);
+        } else fill.style.width = '0%';
+      });
+
+      slideTimer = setTimeout(nextStorySlide, 5000);
+    }
+
+    function nextStorySlide() {
+      clearTimeout(slideTimer);
+      const hl = highlightsData[activeHlIdx];
+      if (activeSlideIdx < hl.images.length - 1) {
+        activeSlideIdx++;
+        showStorySlide();
+      } else {
+        closeStoryModal();
+      }
+    }
+
+    function prevStorySlide() {
+      clearTimeout(slideTimer);
+      if (activeSlideIdx > 0) {
+        activeSlideIdx--;
+        showStorySlide();
+      }
+    }
+
+    function closeStoryModal() {
+      clearTimeout(slideTimer);
+      document.getElementById('storyModal').classList.remove('show');
+    }
+
+    function bindTap(el, cb) {
+      if (!el) return;
+      let sx = 0, sy = 0, st = 0;
+      el.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; st = Date.now(); }, { passive: true });
+      el.addEventListener('pointerup', e => {
+        if (Math.abs(e.clientX - sx) < 15 && Math.abs(e.clientY - sy) < 15 && (Date.now() - st) < 450) {
+          e.preventDefault();
+          cb();
+        }
+      });
+    }
+    bindTap(document.getElementById('storyNavRight'), nextStorySlide);
+    bindTap(document.getElementById('storyNavLeft'), prevStorySlide);
+
+    // Reviews
+    let currentRating = 5;
+    function selectStar(num) {
+      currentRating = num;
+      document.querySelectorAll('.star-btn').forEach((b, i) => {
+        if (i < num) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+    }
+
+    async function submitReview() {
+      const name = document.getElementById('custNameInput').value.trim();
+      const msg = document.getElementById('custMsgInput').value.trim();
+      const btn = document.getElementById('sendReviewBtn');
+      if (!name || !msg) {
+        alert("กรุณากรอกชื่อและข้อความรีวิวด้วยนะคะ ♡");
+        return;
+      }
+      btn.disabled = true;
+      try {
+        await db.collection(DB_REVIEWS).add({
+          name: name,
+          msg: msg,
+          stars: currentRating,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('custNameInput').value = '';
+        document.getElementById('custMsgInput').value = '';
+        selectStar(5);
+        alert("ส่งรีวิวเรียบร้อยแล้วค่ะ ขอบคุณมากนะคะ ♡");
+      } catch (e) {
+        alert("เกิดข้อผิดพลาดในการส่งรีวิว");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    db.collection(DB_REVIEWS).orderBy("createdAt", "desc").onSnapshot(snap => {
+      const box = document.getElementById('feedbackFeed');
+      box.innerHTML = '';
+      if (snap.empty) {
+        box.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--text-muted); padding:10px;">ยังไม่มีรีวิว มารีวิวเป็นคนแรกได้เลยนะคะ ♡</p>';
+        return;
+      }
+      snap.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement('div');
+        div.className = 'review-bubble';
+        div.innerHTML = `
+          <div class="review-bubble-head">
+            <span class="review-cust-name">${d.name}</span>
+            <span class="review-stars-display">${'★'.repeat(d.stars || 5)}</span>
+          </div>
+          <div class="review-cust-msg">${d.msg}</div>
+        `;
+        box.appendChild(div);
+      });
+    });
+
+    // เลเยอร์ลอยโมโนโครมพาสเทล
+    const icons = ['🩶', '🪽 ', '☁️'];
+    const floatBox = document.getElementById('floatingLayer');
+    setInterval(() => {
+      const el = document.createElement('div');
+      el.className = 'float-item';
+      el.textContent = icons[Math.floor(Math.random() * icons.length)];
+      el.style.left = Math.random() * 92 + 'vw';
+      el.style.animationDuration = (9 + Math.random() * 5) + 's';
+      floatBox.appendChild(el);
+      setTimeout(() => el.remove(), 14000);
+    }, 1400);
+  </script>
+</body>
+</html>
