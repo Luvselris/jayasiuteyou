@@ -154,21 +154,32 @@
       display: block;
     }
 
+    /* กล่องและกรอบรูปโปรไฟล์ */
     .profile-wrap {
       text-align: center;
       margin-bottom: 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .profile-container {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .profile-circle {
-      width: 92px;
-      height: 92px;
-      margin: 0 auto;
+      width: 82px;
+      height: 82px;
       border-radius: 50%;
-      padding: 3px;
-      background: #ffffff;
-      border: 2px solid var(--border-color);
-      box-shadow: 0 0 0 4px #f4f4f6, var(--shadow-soft);
       overflow: hidden;
+      background: #f0f0f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .profile-circle img {
@@ -177,7 +188,17 @@
       border-radius: 50%;
       object-fit: cover;
       display: block;
-      background: #f0f0f3;
+    }
+
+    .profile-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      object-fit: contain;
     }
 
     .store-title {
@@ -543,9 +564,13 @@
         <img id="mainBanner" src="" alt="Banner">
       </div>
 
+      <!-- ส่วนโปรไฟล์พร้อมกรอบ -->
       <div class="profile-wrap">
-        <div class="profile-circle">
-          <img id="mainProfile" src="" alt="Profile">
+        <div class="profile-container">
+          <div class="profile-circle">
+            <img id="mainProfile" src="" alt="Profile">
+          </div>
+          <img class="profile-frame" src="https://i.ibb.co/8LZ9KFym/IMG-3743.png" alt="Profile Frame">
         </div>
       </div>
 
@@ -557,7 +582,7 @@
       </div>
 
       <div class="section-label">
-        <span>🩶</span> <span>Highlights</span>
+        <span>🪽</span> <span>Highlights</span>
       </div>
 
       <!-- ไฮไลท์ไม่จำกัดจำนวน -->
@@ -627,9 +652,10 @@
     <div class="tab-content" id="tab-details">
       <div class="details-white-card">
         <div style="font-weight:700; color:var(--accent-dark); margin-bottom:8px;" id="detailsTitle">รายละเอียดร้าน jayasiuteyou</div>
-        <div id="detailsContentText">รับกด กรอบ ป้ายชื่อ เอฟเฟกต์ discord เริ่มต้น 40.-
-รับส่งสติ๊กเกอร์ ธีม
-เมโลดี้ อีโมจิ
+        <div id="detailsContentText">
+รับกด กรอบ ป้ายชื่อ เอฟเฟกต์ discord เริ่มต้น 40.-
+รับส่งสติ๊กִเกอׂร์ ธีมִ
+เׂมโลִดี้ อีโมจิ
 และอื่นๆที่ได้เงิน ♡
         </div>
       </div>
@@ -700,7 +726,6 @@
 
     let highlightsData = [];
 
-    // ฟังก์ชันแสดงผลข้อมูล
     function applyData(d) {
       if (!d) return;
       if (d.siteTitle) document.getElementById('pageTitle').textContent = d.siteTitle;
@@ -723,13 +748,11 @@
       }
     }
 
-    // โหลดข้อมูลจากแคชในเครื่องทันที เปิดเว็บปุ๊บรูปโปรไฟล์ขึ้นปั๊บ
     try {
       const cached = localStorage.getItem('jaya_cached_data');
       if (cached) applyData(JSON.parse(cached));
     } catch (e) {}
 
-    // ดึง Realtime จาก Firebase แล้วบันทึกลงแคช
     db.collection(DB_CONFIG).doc("main").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
@@ -904,8 +927,7 @@
       });
     });
 
-    // เลเยอร์ลอยโมโนโครมพาสเทล
-    const icons = ['♡', '☁️', '🪽', '🩶'];
+    const icons = ['♡', '☁️', '🪽' , '🩶'];
     const floatBox = document.getElementById('floatingLayer');
     setInterval(() => {
       const el = document.createElement('div');
