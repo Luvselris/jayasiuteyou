@@ -142,7 +142,7 @@
       border-radius: 24px;
       overflow: hidden;
       border: 1.5px solid var(--border-color);
-      background: #ffffff;
+      background: #f0f0f3;
       box-shadow: var(--shadow-soft);
       margin-bottom: 22px;
     }
@@ -151,6 +151,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .profile-wrap {
@@ -167,6 +168,7 @@
       background: #ffffff;
       border: 2px solid var(--border-color);
       box-shadow: 0 0 0 4px #f4f4f6, var(--shadow-soft);
+      overflow: hidden;
     }
 
     .profile-circle img {
@@ -174,6 +176,8 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
+      display: block;
+      background: #f0f0f3;
     }
 
     .store-title {
@@ -536,12 +540,12 @@
     <!-- 1. Home -->
     <div class="tab-content active" id="tab-home">
       <div class="banner-box">
-        <img id="mainBanner" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop" alt="Banner">
+        <img id="mainBanner" src="" alt="Banner">
       </div>
 
       <div class="profile-wrap">
         <div class="profile-circle">
-          <img id="mainProfile" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop" alt="Profile">
+          <img id="mainProfile" src="" alt="Profile">
         </div>
       </div>
 
@@ -553,7 +557,7 @@
       </div>
 
       <div class="section-label">
-        <span>🪽</span> <span>Highlights</span>
+        <span>🩶</span> <span>Highlights</span>
       </div>
 
       <!-- ไฮไลท์ไม่จำกัดจำนวน -->
@@ -652,7 +656,6 @@
   </div>
 
   <script>
-    // แยกฐานข้อมูลใหม่เฉพาะโปรเจกต์ jayasiuteyou เท่านั้น
     const DB_CONFIG = "jayasiuteyou_config";
     const DB_REVIEWS = "jayasiuteyou_reviews";
 
@@ -697,30 +700,41 @@
 
     let highlightsData = [];
 
-    // ดึงข้อมูล Realtime
+    // ฟังก์ชันแสดงผลข้อมูล
+    function applyData(d) {
+      if (!d) return;
+      if (d.siteTitle) document.getElementById('pageTitle').textContent = d.siteTitle;
+      if (d.storeName) document.getElementById('storeNameText').textContent = d.storeName;
+      if (d.storeBio) document.getElementById('bioBoxText').textContent = d.storeBio;
+      if (d.bannerImg) document.getElementById('mainBanner').src = d.bannerImg;
+      if (d.profileImg) document.getElementById('mainProfile').src = d.profileImg;
+      if (d.details) document.getElementById('detailsContentText').textContent = d.details;
+      if (d.lineUrl) document.getElementById('lineLink').href = d.lineUrl;
+      if (d.discordUrl) document.getElementById('discordLink').href = d.discordUrl;
+
+      if (d.musicUrl && audio.src !== d.musicUrl) {
+        audio.src = d.musicUrl;
+        unlockAudio();
+      }
+
+      if (d.highlights && Array.isArray(d.highlights)) {
+        highlightsData = d.highlights;
+        renderHighlights(d.highlights);
+      }
+    }
+
+    // โหลดข้อมูลจากแคชในเครื่องทันที เปิดเว็บปุ๊บรูปโปรไฟล์ขึ้นปั๊บ
+    try {
+      const cached = localStorage.getItem('jaya_cached_data');
+      if (cached) applyData(JSON.parse(cached));
+    } catch (e) {}
+
+    // ดึง Realtime จาก Firebase แล้วบันทึกลงแคช
     db.collection(DB_CONFIG).doc("main").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
-        if (d.siteTitle) document.getElementById('pageTitle').textContent = d.siteTitle;
-        if (d.storeName) document.getElementById('storeNameText').textContent = d.storeName;
-        if (d.storeBio) document.getElementById('bioBoxText').textContent = d.storeBio;
-        if (d.bannerImg) document.getElementById('mainBanner').src = d.bannerImg;
-        if (d.profileImg) document.getElementById('mainProfile').src = d.profileImg;
-        if (d.details) document.getElementById('detailsContentText').textContent = d.details;
-        if (d.lineUrl) document.getElementById('lineLink').href = d.lineUrl;
-        if (d.discordUrl) document.getElementById('discordLink').href = d.discordUrl;
-
-        if (d.musicUrl && audio.src !== d.musicUrl) {
-          audio.src = d.musicUrl;
-          unlockAudio();
-        }
-
-        if (d.highlights && Array.isArray(d.highlights)) {
-          highlightsData = d.highlights;
-          renderHighlights(d.highlights);
-        }
-      } else {
-        renderHighlights(highlightsData);
+        localStorage.setItem('jaya_cached_data', JSON.stringify(d));
+        applyData(d);
       }
     });
 
@@ -891,7 +905,7 @@
     });
 
     // เลเยอร์ลอยโมโนโครมพาสเทล
-    const icons = ['🩶', '🪽 ', '☁️'];
+    const icons = ['♡', '☁️', '🪽', '🩶'];
     const floatBox = document.getElementById('floatingLayer');
     setInterval(() => {
       const el = document.createElement('div');
