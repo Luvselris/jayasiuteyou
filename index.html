@@ -576,7 +576,8 @@
 
       <h1 class="store-title" id="storeNameText">Jayasiuteyou</h1>
 
-      <div class="bio-dashed-box" id="bioBoxText">welcome to jayasiuteyou ♡
+      <div class="bio-dashed-box" id="bioBoxText">
+welcome to jayasiuteyou ♡
 รับกดกรอบป้ายชื่อเอฟเฟค discord
 รับส่งสติ๊กเกอร์ อีโมจิ ธีม เมโลดี้ ♡
       </div>
@@ -654,8 +655,8 @@
         <div style="font-weight:700; color:var(--accent-dark); margin-bottom:8px;" id="detailsTitle">รายละเอียดร้าน jayasiuteyou</div>
         <div id="detailsContentText">
 รับกด กรอบ ป้ายชื่อ เอฟเฟกต์ discord เริ่มต้น 40.-
-รับส่งสติ๊กִเกอׂร์ ธีมִ
-เׂมโลִดี้ อีโมจิ
+รับส่งสติ๊กเกอร์ ธีม
+เมโลดี้ อีโมจิ
 และอื่นๆที่ได้เงิน ♡
         </div>
       </div>
@@ -683,6 +684,7 @@
 
   <script>
     const DB_CONFIG = "jayasiuteyou_config";
+    const DB_HL = "jayasiuteyou_highlights";
     const DB_REVIEWS = "jayasiuteyou_reviews";
 
     const firebaseConfig = {
@@ -741,11 +743,6 @@
         audio.src = d.musicUrl;
         unlockAudio();
       }
-
-      if (d.highlights && Array.isArray(d.highlights)) {
-        highlightsData = d.highlights;
-        renderHighlights(d.highlights);
-      }
     }
 
     try {
@@ -753,12 +750,22 @@
       if (cached) applyData(JSON.parse(cached));
     } catch (e) {}
 
+    // 1. ดึงข้อมูลร้านค้า
     db.collection(DB_CONFIG).doc("main").onSnapshot(doc => {
       if (doc.exists) {
         const d = doc.data();
         localStorage.setItem('jaya_cached_data', JSON.stringify(d));
         applyData(d);
       }
+    });
+
+    // 2. ดึงไฮไลท์แยกก้อนอิสระ (ไม่มีปัญหาชนเพดาน 1 MB)
+    db.collection(DB_HL).orderBy("order", "asc").onSnapshot(snap => {
+      highlightsData = [];
+      snap.forEach(doc => {
+        highlightsData.push(doc.data());
+      });
+      renderHighlights(highlightsData);
     });
 
     function renderHighlights(hl) {
@@ -927,7 +934,7 @@
       });
     });
 
-    const icons = ['♡', '☁️', '🪽' , '🩶'];
+    const icons = ['♡', '☁️', '🪽', '🩶'];
     const floatBox = document.getElementById('floatingLayer');
     setInterval(() => {
       const el = document.createElement('div');
