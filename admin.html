@@ -424,7 +424,7 @@
 
     async function uploadCover(e, idx) {
       if (e.target.files && e.target.files[0]) {
-        siteConfig.highlights[idx].cover = await compressImg(e.target.files[0], 400, 0.9);
+        siteConfig.highlights[idx].cover = await compressImg(e.target.files[0], 300, 0.75);
       }
     }
 
@@ -432,7 +432,7 @@
       const files = Array.from(e.target.files);
       if (!siteConfig.highlights[idx].images) siteConfig.highlights[idx].images = [];
       for (const f of files) {
-        const b64 = await compressImg(f, 1200, 0.92);
+        const b64 = await compressImg(f, 720, 0.72);
         siteConfig.highlights[idx].images.push(b64);
       }
       renderHighlightsAdmin();
